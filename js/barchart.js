@@ -16,9 +16,10 @@ const margin = {left:50, right:50, bottom:50, top:50};
 const yTooltipOffset = 15; 
 
 
-// TODO: What does this code do? 
-const svg1 = d3
-  .select("#hard-coded-bar")
+// TODO: What does this code do?
+// Using the D3 library select the tag with the id "hard-coded-bar" add an svg tag within it
+// And set the svg attributes of width, height and viewBox to the variables below
+const svg1 = d3.select("#hard-coded-bar")
   .append("svg")
   .attr("width", width-margin.left-margin.right)
   .attr("height", height - margin.top - margin.bottom)
@@ -35,31 +36,81 @@ const data1 = [
   {name: 'G', score: 18}
 ];
 
+// CSV barchart
+d3.csv("data/barchart.csv").then(data2 => {
+  console.log(data2);
+
+  const svg2 = d3.select("#csv-bar")
+      .append("svg")
+      .attr("width", width-margin.left-margin.right)
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("viewBox", [0, 0, width, height]);
+
+  let maxY1 = d3.max(data2, function(d) { return d.score; });
+
+  let yScale1 = d3.scaleLinear()
+      .domain([0,maxY1])
+      .range([height-margin.bottom,margin.top]);
+
+  let xScale1 = d3.scaleBand()
+      .domain(d3.range(data2.length))
+      .range([margin.left, width - margin.right])
+      .padding(0.1);
+
+  svg2.append("g")
+      .attr("transform", `translate(${margin.left}, 0)`)
+      .call(d3.axisLeft(yScale1))
+      .attr("font-size", '20px');
+
+  svg2.append("g")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(xScale1)
+          .tickFormat(i => data2[i].name))
+      .attr("font-size", '20px');
+
+  svg2.selectAll(".bar2")
+      .data(data2)
+      .enter()
+      .append("rect")
+      .attr("class", "bar2")
+      .attr("x", (d,i) => xScale1(i))
+      .attr("y", (d) => yScale1(d.score))
+      .attr("height", (d) => (height - margin.bottom) - yScale1(d.score))
+      .attr("width", xScale1.bandwidth())
+      .on("mouseover", mouseover1)
+      .on("mousemove", mousemove1)
+      .on("mouseleave", mouseleave1);
+
+});
+
 /*
 
   Axes
 
 */ 
 
-// TODO: What does this code do? 
+// TODO: What does this code do?
+// Get the highest score
 let maxY1 = d3.max(data1, function(d) { return d.score; });
 
-// TODO: What does each line of this code do?   
+// TODO: What does each line of this code do?
+// Take data values and maps them to pixel values for x-axis
 let yScale1 = d3.scaleLinear()
             .domain([0,maxY1])
             .range([height-margin.bottom,margin.top]); 
 
-// TODO: What does each line of this code do? 
+// TODO: What does each line of this code do?
+// Take data values and maps them to pixel values for x-axis
 let xScale1 = d3.scaleBand()
             .domain(d3.range(data1.length))
             .range([margin.left, width - margin.right])
-            .padding(0.1); 
+            .padding(0.1);
 
 // TODO: What does each line of this code do?  
 svg1.append("g")
    .attr("transform", `translate(${margin.left}, 0)`) 
    .call(d3.axisLeft(yScale1)) 
-   .attr("font-size", '20px'); 
+   .attr("font-size", '20px');
 
 // TODO: What does each line of this code do? 
 svg1.append("g")
